@@ -2,6 +2,7 @@ package docker
 
 import (
 	"fmt"
+	"github.com/replicate/cog/pkg/config"
 	"os"
 	"os/exec"
 	"runtime"
@@ -10,8 +11,6 @@ import (
 	"github.com/replicate/cog/pkg/util"
 	"github.com/replicate/cog/pkg/util/console"
 )
-
-const minimumBuildKitVersionEpochRewrite = "0.13.0"
 
 func Build(dir, dockerfile, imageName string, secrets []string, noCache bool, progressOutput string, epoch int64) error {
 	var args []string
@@ -44,9 +43,15 @@ func Build(dir, dockerfile, imageName string, secrets []string, noCache bool, pr
 
 	}
 
+	if config.BuildXCachePath != "" {
+		args = append(args, "--cache-from", "type=local,src="+config.BuildXCachePath)
+		args = append(args, "--cache-to", "type=local,dest="+config.BuildXCachePath)
+	} else {
+		args = append(args, "--cache-to", "type=inline")
+	}
+
 	args = append(args,
 		"--file", "-",
-		"--cache-to", "type=inline",
 		"--tag", imageName,
 		"--progress", progressOutput,
 		".",
