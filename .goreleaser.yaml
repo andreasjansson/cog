@@ -55,3 +55,17 @@ release:
   # If set to true, will mark the release as not ready for production.
   # Default is false.
   prerelease: auto
+  disable: true
+
+# Publish the binaries to GCS
+blobs:
+  - provider: gs
+    ids:
+      - cog
+    bucket: replicate-pipelines-beta
+    directory: "releases/{{.Version}}"
+  - provider: gs
+    ids:
+      - cog
+    bucket: replicate-pipelines-beta
+    directory: "releases/latest"
